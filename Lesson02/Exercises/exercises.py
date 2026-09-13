@@ -1,9 +1,14 @@
 """
-Lesson 2 In-Class Exercises (No Answers)
-========================================
+Lesson 2 In-Class Exercises
+===========================
 
-This file is scaffold-only.
-Use the matching examples file as your reference.
+Completed practice for:
+- Collections
+- Nested dictionaries
+- Indexing and slicing
+- Control flow
+- Functions and scope
+- Rock-Paper-Scissors logic
 """
 
 import random
@@ -13,36 +18,71 @@ import random
 # Exercise 1: Collections Practice
 # =============================
 
-# TODO: Create an `inventory` dictionary with nested details.
-# TODO: Add one new product.
-# TODO: Update stock for one product.
-# TODO: Loop through inventory and print a summary.
+inventory = {
+    "Laptop": {"price": 899.99, "stock": 5},
+    "Mouse": {"price": 24.99, "stock": 10},
+}
+
+# Add one new product.
+inventory["Keyboard"] = {"price": 49.99, "stock": 7}
+
+# Update stock for one product.
+inventory["Mouse"]["stock"] = 12
+
+# Loop through inventory and print a summary.
+for product, details in inventory.items():
+    print(
+        f"{product}: Price ${details['price']}, "
+        f"Stock {details['stock']}"
+    )
 
 
 # =============================
 # Exercise 2: Student Tracker
 # =============================
 
-# TODO: Create a nested dictionary for students and grades.
-# TODO: Add one student.
-# TODO: Update one existing grade.
-# TODO: Compute and print each student's average.
+students = {
+    "Eli": {"grades": [90, 85, 95]},
+    "Alice": {"grades": [88, 92, 84]},
+}
+
+# Add one student.
+students["Bob"] = {"grades": [80, 85, 90]}
+
+# Update one existing grade.
+students["Eli"]["grades"][1] = 90
+
+# Compute and print each student's average.
+for student, details in students.items():
+    grades = details["grades"]
+    average = sum(grades) / len(grades)
+    print(f"{student}'s average: {average:.2f}")
 
 
 # =============================
 # Exercise 3: Indexing and Slicing
 # =============================
 
-# TODO: Create a sentence string.
-# TODO: Print first N characters, last N characters, and a stepped slice.
+sentence = "Python is a useful programming language."
+
+print(f"First 6 characters: {sentence[:6]}")
+print(f"Last 9 characters: {sentence[-9:]}")
+print(f"Every second character: {sentence[::2]}")
 
 
 # =============================
 # Exercise 4: Control Flow
 # =============================
 
-# TODO: Iterate through a list of integers.
-# TODO: Print whether each number is positive, negative, or zero.
+numbers = [10, -4, 0, 7, -2]
+
+for number in numbers:
+    if number > 0:
+        print(f"{number} is positive.")
+    elif number < 0:
+        print(f"{number} is negative.")
+    else:
+        print(f"{number} is zero.")
 
 
 # =============================
@@ -63,8 +103,8 @@ def summarize_student(name, grades):
     Returns:
         str: Summary line.
     """
-    # TODO: Compute average and return formatted summary.
-    pass
+    average = sum(grades) / len(grades)
+    return f"{name} is enrolled in {course_name} with an average of {average:.2f}."
 
 
 # =============================
@@ -91,11 +131,28 @@ def determine_rps_winner(player_choice, computer_choice):
     Returns:
         str: "Player wins", "Computer wins", or "Tie".
     """
-    # TODO: Implement winner logic.
-    pass
+    if player_choice == computer_choice:
+        return "Tie"
+
+    elif (
+        (player_choice == "Rock" and computer_choice == "Scissors")
+        or (player_choice == "Paper" and computer_choice == "Rock")
+        or (player_choice == "Scissors" and computer_choice == "Paper")
+    ):
+        return "Player wins"
+
+    else:
+        return "Computer wins"
 
 
 if __name__ == "__main__":
-    # TODO: Add quick test run with one random computer choice.
-    _ = random
-    pass
+    print()
+    print(summarize_student("Eli", [90, 95, 88]))
+
+    choices = ["Rock", "Paper", "Scissors"]
+    player_choice = "Rock"
+    computer_choice = random.choice(choices)
+
+    print(f"Player chose: {player_choice}")
+    print(f"Computer chose: {computer_choice}")
+    print(determine_rps_winner(player_choice, computer_choice))
