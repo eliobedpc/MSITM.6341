@@ -1,13 +1,6 @@
 """
 Lesson 6 In-Class Exercises
 ===========================
-
-Topics:
-- NumPy
-- Pandas filtering
-- Normalization
-- Exploratory Data Analysis
-- Data visualization
 """
 
 import matplotlib.pyplot as plt
