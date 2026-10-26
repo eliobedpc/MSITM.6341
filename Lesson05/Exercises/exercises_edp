@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+"""
+Lesson 5 In-Class Exercises
+===========================
+
+Topics:
+- API requests
+- JSON and CSV files
+- Directories and file handling
+- Optional pandas analysis
+"""
+
+import csv
+import json
+import os
+
+import requests
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+
+def exercise_1():
+    """
+    API Data Fetch and CSV Conversion.
+    """
+    print("\n--- Exercise 1 ---")
+
+    url = "https://jsonplaceholder.typicode.com/posts"
+
+    # Request data from API and handle errors.
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
+        posts = response.json()
+
+        print("API data downloaded successfully.")
+
+    except requests.RequestException as error:
+        print(f"Error downloading API data: {error}")
+        return
+
+    # Save data to posts.json.
+    with open("posts.json", "w") as json_file:
+        json.dump(posts, json_file, indent=4)
+
+    print("Data saved to posts.json")
+
+    # Read posts.json.
+    with open("posts.json", "r") as json_file:
+        saved_posts = json.load(json_file)
+
+    # Export selected fields to posts.csv.
+    with open("posts.csv", "w", newline="") as csv_file:
+        fieldnames = ["userId", "id", "title"]
+
+        writer = csv.DictWriter(
+            csv_file,
+            fieldnames=fieldnames
+        )
+
+        writer.writeheader()
+
+        for post in saved_posts:
+            writer.writerow({
+                "userId": post["userId"],
+                "id": post["id"],
+                "title": post["title"]
+            })
+
+    print("Selected data exported to posts.csv")
+
+
+def exercise_2():
+    """
+    Directory analysis and file manipulation.
+    """
+    print("\n--- Exercise 2 ---")
+
+    dir_name = "data"
+
+    # Create data directory if missing.
+    os.makedirs(dir_name, exist_ok=True)
+
+    # Create three text files.
+    filenames = [
+        "file1.txt",
+        "file2.txt",
+        "file3.txt"
+    ]
+
+    for filename in filenames:
+
+        file_path = os.path.join(dir_name, filename)
+
+        with open(file_path, "w") as file:
+            file.write(
+                f"This is sample content for {filename}."
+            )
+
+    print("Files created successfully.")
+
+    # Print each file name and size.
+    for filename in os.listdir(dir_name):
+
+        file_path = os.path.join(dir_name, filename)
+
+        if os.path.isfile(file_path):
+            file_size = os.path.getsize(file_path)
+
+            print(
+                f"File: {filename} | "
+                f"Size: {file_size} bytes"
+            )
+
+
+def exercise_3():
+    """
+    CSV -> JSON pipeline with optional pandas analysis.
+    """
+    print("\n--- Exercise 3 ---")
+
+    csv_filename = "students.csv"
+    json_filename = "students.json"
+
+    # Sample student data.
+    students = [
+        ["Eli", 40, 95],
+        ["Alice", 24, 90],
+        ["Bob", 27, 85],
+        ["Maria", 22, 92]
+    ]
+
+    # Create CSV with header and sample rows.
+    with open(csv_filename, "w", newline="") as csv_file:
+
+        writer = csv.writer(csv_file)
+
+        writer.writerow([
+            "name",
+            "age",
+            "grade"
+        ])
+
+        writer.writerows(students)
+
+    print("students.csv created.")
+
+    # Read CSV using DictReader into a list.
+    student_list = []
+
+    with open(csv_filename, "r") as csv_file:
+
+        reader = csv.DictReader(csv_file)
+
+        for row in reader:
+            student_list.append(row)
+
+    print("CSV data read successfully.")
+
+    # Write list to JSON.
+    with open(json_filename, "w") as json_file:
+
+        json.dump(
+            student_list,
+            json_file,
+            indent=4
+        )
+
+    print("students.json created.")
+
+    # If pandas is available, calculate averages.
+    if pd is not None:
+
+        dataframe = pd.read_csv(csv_filename)
+
+        average_age = dataframe["age"].mean()
+        average_grade = dataframe["grade"].mean()
+
+        print(
+            f"Average age: {average_age:.2f}"
+        )
+
+        print(
+            f"Average grade: {average_grade:.2f}"
+        )
+
+    else:
+
+        print(
+            "Pandas is not installed. "
+            "Skipping pandas analysis."
+        )
+
+
+def main_exercises():
+    """
+    Run all Lesson 5 exercises.
+    """
+    exercise_1()
+    exercise_2()
+    exercise_3()
+
+
+if __name__ == "__main__":
+    main_exercises()
