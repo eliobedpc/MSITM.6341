@@ -1,0 +1,261 @@
+"""
+Lesson 7 In-Class Exercises
+===========================
+"""
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
+
+
+data = {
+    "StudentID": [101, 102, 103, 104, 105, 106, 107],
+    "Hours_Studied": [5, 3, 8, 2, 7, 6, 1],
+    "Attendance_Rate": [0.9, 0.6, 0.95, 0.5, 0.8, 0.85, 0.4],
+    "Assignments_Completed": [10, 7, 12, 6, 11, 10, 4],
+    "Passed": [1, 0, 1, 0, 1, 1, 0],
+}
+
+
+df = pd.DataFrame(data)
+
+
+def exploration_exercise():
+    """
+    Inspect the dataset and basic quality metrics.
+    """
+
+    print("\n--- Data Exploration ---")
+
+    # Print first rows.
+    print("\nFirst rows:")
+    print(df.head())
+
+    # Check for missing values.
+    print("\nMissing Values:")
+    print(df.isnull().sum())
+
+    # Show basic statistics.
+    print("\nDataset Statistics:")
+    print(df.describe())
+
+
+def visualization_exercise():
+    """
+    Create pairplot and correlation heatmap.
+    """
+
+    print("\n--- Data Visualization ---")
+
+    # Pairplot
+    sns.pairplot(
+        df[
+            [
+                "Hours_Studied",
+                "Attendance_Rate",
+                "Assignments_Completed",
+                "Passed",
+            ]
+        ],
+        hue="Passed"
+    )
+
+    plt.show()
+
+    # Correlation matrix
+    correlation = df[
+        [
+            "Hours_Studied",
+            "Attendance_Rate",
+            "Assignments_Completed",
+            "Passed",
+        ]
+    ].corr()
+
+    print("\nCorrelation Matrix:")
+    print(correlation)
+
+    # Correlation heatmap
+    sns.heatmap(
+        correlation,
+        annot=True
+    )
+
+    plt.title(
+        "Student Data Correlation"
+    )
+
+    plt.show()
+
+
+def preprocessing_exercise():
+    """
+    Prepare model features and train/test split.
+    """
+
+    print("\n--- Data Preprocessing ---")
+
+    # Features used to predict whether a student passed.
+    X = df[
+        [
+            "Hours_Studied",
+            "Attendance_Rate",
+            "Assignments_Completed",
+        ]
+    ].copy()
+
+    # Target value.
+    y = df["Passed"]
+
+    # Simple min-max normalization.
+    for column in X.columns:
+
+        minimum = X[column].min()
+        maximum = X[column].max()
+
+        X[column] = (
+            X[column] - minimum
+        ) / (
+            maximum - minimum
+        )
+
+    print("\nNormalized Features:")
+    print(X)
+
+    # Split data into training and testing sets.
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.3,
+        random_state=42
+    )
+
+    print("\nTraining rows:")
+    print(len(X_train))
+
+    print("Testing rows:")
+    print(len(X_test))
+
+    return X_train, X_test, y_train, y_test, X.columns
+
+
+def modeling_exercise(
+    X_train,
+    X_test,
+    y_train,
+    y_test
+):
+    """
+    Train and evaluate a RandomForest classifier.
+    """
+
+    print("\n--- Machine Learning Model ---")
+
+    # Create model.
+    model = RandomForestClassifier(
+        random_state=42
+    )
+
+    # Train model.
+    model.fit(
+        X_train,
+        y_train
+    )
+
+    # Make predictions.
+    predictions = model.predict(
+        X_test
+    )
+
+    print("\nPredicted values:")
+    print(predictions)
+
+    print("\nActual values:")
+    print(y_test.values)
+
+    # Calculate accuracy.
+    accuracy = accuracy_score(
+        y_test,
+        predictions
+    )
+
+    print(
+        f"\nModel Accuracy: "
+        f"{accuracy * 100:.2f}%"
+    )
+
+    # Classification report.
+    print("\nClassification Report:")
+
+    print(
+        classification_report(
+            y_test,
+            predictions,
+            zero_division=0
+        )
+    )
+
+    return model
+
+
+def feature_importance_exercise(
+    model,
+    feature_names
+):
+    """
+    Plot model feature importance.
+    """
+
+    print("\n--- Feature Importance ---")
+
+    importance_data = pd.DataFrame(
+        {
+            "Feature": feature_names,
+            "Importance": model.feature_importances_,
+        }
+    )
+
+    print(importance_data)
+
+    sns.barplot(
+        data=importance_data,
+        x="Importance",
+        y="Feature"
+    )
+
+    plt.title(
+        "Feature Importance"
+    )
+
+    plt.show()
+
+
+if __name__ == "__main__":
+
+    exploration_exercise()
+
+    visualization_exercise()
+
+    (
+        X_train,
+        X_test,
+        y_train,
+        y_test,
+        feature_names,
+    ) = preprocessing_exercise()
+
+    model = modeling_exercise(
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    )
+
+    feature_importance_exercise(
+        model,
+        feature_names
+    )
