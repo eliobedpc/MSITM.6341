@@ -1,0 +1,328 @@
+"""
+Lesson 6 Take-Home Assignment: Kaggle Dataset EDA
+=================================================
+"""
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+
+def load_dataset(file_name):
+    """
+    Load a CSV file selected by the student.
+
+    Args:
+        file_name (str): CSV filename.
+
+    Returns:
+        pandas.DataFrame: Loaded dataset.
+    """
+
+    try:
+        df = pd.read_csv(file_name)
+        print("\nDataset loaded successfully.")
+        return df
+
+    except FileNotFoundError:
+        print("\nError: File was not found.")
+        return None
+
+    except Exception as error:
+        print(f"\nError loading dataset: {error}")
+        return None
+
+
+def clean_dataset(df):
+    """
+    Apply missing-value strategy chosen by the user.
+
+    Args:
+        df (pandas.DataFrame): Raw dataset.
+
+    Returns:
+        pandas.DataFrame: Cleaned dataset.
+    """
+
+    print("\n--- Missing Value Cleaning ---")
+
+    print("1. Fill missing values")
+    print("2. Drop rows with missing values")
+
+    choice = input(
+        "Choose a cleaning method (1/2): "
+    ).strip()
+
+    if choice == "1":
+
+        # Fill numeric columns with their mean.
+        numeric_columns = df.select_dtypes(
+            include="number"
+        ).columns
+
+        for column in numeric_columns:
+            df[column] = df[column].fillna(
+                df[column].mean()
+            )
+
+        # Fill text columns with "Unknown".
+        text_columns = df.select_dtypes(
+            include="object"
+        ).columns
+
+        for column in text_columns:
+            df[column] = df[column].fillna(
+                "Unknown"
+            )
+
+        print("Missing values were filled.")
+
+    elif choice == "2":
+
+        df = df.dropna()
+
+        print("Rows with missing values were removed.")
+
+    else:
+
+        print(
+            "Invalid choice. "
+            "Dataset was not changed."
+        )
+
+    return df
+
+
+def summarize_column(df, column_name):
+    """
+    Print descriptive statistics for one selected column.
+
+    Args:
+        df (pandas.DataFrame): Dataset.
+        column_name (str): Column to summarize.
+    """
+
+    if column_name not in df.columns:
+        print("\nInvalid column name.")
+        return
+
+    print(
+        f"\n--- Summary for {column_name} ---"
+    )
+
+    print(df[column_name].describe())
+
+    if pd.api.types.is_numeric_dtype(
+        df[column_name]
+    ):
+
+        print(
+            f"Mean: "
+            f"{df[column_name].mean():.2f}"
+        )
+
+        print(
+            f"Median: "
+            f"{df[column_name].median():.2f}"
+        )
+
+        print(
+            f"Standard Deviation: "
+            f"{df[column_name].std():.2f}"
+        )
+
+
+def create_visualizations(df):
+    """
+    Generate at least two visualizations.
+
+    Args:
+        df (pandas.DataFrame): Dataset to plot.
+    """
+
+    print("\n--- Visualization 1 ---")
+
+    print("1. Histogram")
+    print("2. Boxplot")
+    print("3. Scatterplot")
+    print("4. Countplot")
+
+    choice1 = input(
+        "Choose your first plot (1/2/3/4): "
+    ).strip()
+
+    generate_plot(df, choice1)
+
+    print("\n--- Visualization 2 ---")
+
+    print("1. Histogram")
+    print("2. Boxplot")
+    print("3. Scatterplot")
+    print("4. Countplot")
+
+    choice2 = input(
+        "Choose your second plot (1/2/3/4): "
+    ).strip()
+
+    generate_plot(df, choice2)
+
+
+def generate_plot(df, choice):
+    """
+    Generate one chart based on user selection.
+    """
+
+    if choice == "1":
+
+        column = input(
+            "Enter a numeric column for the histogram: "
+        ).strip()
+
+        if column in df.columns:
+
+            sns.histplot(
+                data=df,
+                x=column
+            )
+
+            plt.title(
+                f"Histogram of {column}"
+            )
+
+            plt.show()
+
+        else:
+            print("Invalid column name.")
+
+    elif choice == "2":
+
+        column = input(
+            "Enter a numeric column for the boxplot: "
+        ).strip()
+
+        if column in df.columns:
+
+            sns.boxplot(
+                data=df,
+                y=column
+            )
+
+            plt.title(
+                f"Boxplot of {column}"
+            )
+
+            plt.show()
+
+        else:
+            print("Invalid column name.")
+
+    elif choice == "3":
+
+        x_column = input(
+            "Enter the X-axis column: "
+        ).strip()
+
+        y_column = input(
+            "Enter the Y-axis column: "
+        ).strip()
+
+        if (
+            x_column in df.columns
+            and y_column in df.columns
+        ):
+
+            sns.scatterplot(
+                data=df,
+                x=x_column,
+                y=y_column
+            )
+
+            plt.title(
+                f"{x_column} vs {y_column}"
+            )
+
+            plt.show()
+
+        else:
+            print("Invalid column name.")
+
+    elif choice == "4":
+
+        column = input(
+            "Enter a column for the countplot: "
+        ).strip()
+
+        if column in df.columns:
+
+            sns.countplot(
+                data=df,
+                x=column
+            )
+
+            plt.title(
+                f"Countplot of {column}"
+            )
+
+            plt.xticks(rotation=45)
+
+            plt.show()
+
+        else:
+            print("Invalid column name.")
+
+    else:
+
+        print("Invalid plot selection.")
+
+
+def main():
+    """
+    Orchestrate Lesson 6 assignment steps.
+    """
+
+    file_name = input(
+        "Enter your Kaggle dataset CSV filename "
+        "(including .csv): "
+    ).strip()
+
+    # Load dataset.
+    df = load_dataset(file_name)
+
+    if df is None:
+        return
+
+    # Show dataset overview.
+    print("\n--- Dataset Preview ---")
+    print(df.head())
+
+    print("\n--- Dataset Information ---")
+    df.info()
+
+    print("\n--- Missing Values ---")
+    print(df.isnull().sum())
+
+    # Clean dataset.
+    df = clean_dataset(df)
+
+    print("\n--- Missing Values After Cleaning ---")
+    print(df.isnull().sum())
+
+    # Ask user for a column to summarize.
+    print("\nAvailable Columns:")
+    print(list(df.columns))
+
+    column_name = input(
+        "Enter a column to summarize: "
+    ).strip()
+
+    summarize_column(
+        df,
+        column_name
+    )
+
+    # Create visualizations.
+    create_visualizations(df)
+
+
+if __name__ == "__main__":
+    main()
