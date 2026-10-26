@@ -1,0 +1,314 @@
+"""
+Lesson 6 In-Class Exercises
+===========================
+
+Topics:
+- NumPy
+- Pandas filtering
+- Normalization
+- Exploratory Data Analysis
+- Data visualization
+"""
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+
+data = {
+    "Player": [
+        "LeBron James",
+        "Stephen Curry",
+        "Kevin Durant",
+        "Giannis Antetokounmpo",
+        "Nikola Jokic",
+        "Luka Doncic",
+        "Joel Embiid",
+        "James Harden",
+        "Jayson Tatum",
+        "Devin Booker",
+    ],
+    "Team": [
+        "Lakers",
+        "Warriors",
+        "Nets",
+        "Bucks",
+        "Nuggets",
+        "Mavericks",
+        "76ers",
+        "76ers",
+        "Celtics",
+        "Suns",
+    ],
+    "Position": [
+        "SF",
+        "PG",
+        "SF",
+        "PF",
+        "C",
+        "PG",
+        "C",
+        "SG",
+        "SF",
+        "SG",
+    ],
+    "PPG": [
+        27.3,
+        29.6,
+        28.5,
+        29.9,
+        26.2,
+        30.2,
+        33.1,
+        21.3,
+        26.7,
+        27.0,
+    ],
+    "APG": [
+        7.4,
+        6.3,
+        5.2,
+        5.9,
+        7.8,
+        8.1,
+        4.3,
+        10.5,
+        4.4,
+        4.8,
+    ],
+    "RPG": [
+        7.9,
+        4.5,
+        7.4,
+        11.7,
+        13.8,
+        9.1,
+        10.6,
+        6.2,
+        8.5,
+        5.1,
+    ],
+}
+
+
+df_nba = pd.DataFrame(data)
+
+
+def numpy_exercise():
+    """
+    Practice NumPy matrix creation and summary statistics.
+    """
+
+    print("\n--- NumPy Exercise ---")
+
+    # Ask user for matrix size.
+    size = int(input("Enter the size of the square matrix: "))
+
+    # Create a random square matrix.
+    matrix = np.random.randint(
+        1,
+        101,
+        size=(size, size)
+    )
+
+    print("\nRandom Matrix:")
+    print(matrix)
+
+    # Compute row means.
+    row_means = np.mean(
+        matrix,
+        axis=1
+    )
+
+    # Compute column means.
+    column_means = np.mean(
+        matrix,
+        axis=0
+    )
+
+    print("\nRow Means:")
+    print(row_means)
+
+    print("\nColumn Means:")
+    print(column_means)
+
+
+def pandas_filter_exercise():
+    """
+    Practice DataFrame filtering based on user input.
+    """
+
+    print("\n--- Pandas Filter Exercise ---")
+
+    team = input(
+        "Enter a team name: "
+    )
+
+    filtered_data = df_nba[
+        df_nba["Team"] == team
+    ]
+
+    if filtered_data.empty:
+        print("No players found for that team.")
+    else:
+        print("\nMatching Players:")
+        print(filtered_data)
+
+
+def normalization_exercise():
+    """
+    Practice min-max normalization on one selected stat column.
+    """
+
+    print("\n--- Normalization Exercise ---")
+
+    column = input(
+        "Choose a column to normalize (PPG/APG/RPG): "
+    ).upper()
+
+    if column not in ["PPG", "APG", "RPG"]:
+        print("Invalid column selection.")
+        return
+
+    minimum = df_nba[column].min()
+    maximum = df_nba[column].max()
+
+    normalized_column = column + "_Normalized"
+
+    df_nba[normalized_column] = (
+        df_nba[column] - minimum
+    ) / (
+        maximum - minimum
+    )
+
+    print(
+        df_nba[
+            ["Player", column, normalized_column]
+        ]
+    )
+
+
+def eda_exercise():
+    """
+    Compute aggregate stats for one selected numeric column.
+    """
+
+    print("\n--- EDA Exercise ---")
+
+    column = input(
+        "Choose a stat column (PPG/APG/RPG): "
+    ).upper()
+
+    if column not in ["PPG", "APG", "RPG"]:
+        print("Invalid column selection.")
+        return
+
+    mean_value = df_nba[column].mean()
+    median_value = df_nba[column].median()
+    std_value = df_nba[column].std()
+
+    print(
+        f"\nMean {column}: "
+        f"{mean_value:.2f}"
+    )
+
+    print(
+        f"Median {column}: "
+        f"{median_value:.2f}"
+    )
+
+    print(
+        f"Standard Deviation {column}: "
+        f"{std_value:.2f}"
+    )
+
+
+def visualization_exercise():
+    """
+    Generate one selected chart.
+    """
+
+    print("\n--- Visualization Exercise ---")
+
+    print("1. Histogram")
+    print("2. Scatter Plot")
+    print("3. Boxplot")
+
+    choice = input(
+        "Choose a plot (1/2/3): "
+    )
+
+    if choice == "1":
+
+        plt.hist(
+            df_nba["PPG"],
+            bins=5
+        )
+
+        plt.title(
+            "NBA Points Per Game"
+        )
+
+        plt.xlabel(
+            "Points Per Game"
+        )
+
+        plt.ylabel(
+            "Frequency"
+        )
+
+        plt.show()
+
+    elif choice == "2":
+
+        plt.scatter(
+            df_nba["PPG"],
+            df_nba["APG"]
+        )
+
+        plt.title(
+            "Points vs Assists"
+        )
+
+        plt.xlabel(
+            "Points Per Game"
+        )
+
+        plt.ylabel(
+            "Assists Per Game"
+        )
+
+        plt.show()
+
+    elif choice == "3":
+
+        sns.boxplot(
+            y=df_nba["RPG"]
+        )
+
+        plt.title(
+            "Rebounds Per Game"
+        )
+
+        plt.ylabel(
+            "Rebounds Per Game"
+        )
+
+        plt.show()
+
+    else:
+        print("Invalid plot selection.")
+
+
+if __name__ == "__main__":
+
+    numpy_exercise()
+
+    pandas_filter_exercise()
+
+    normalization_exercise()
+
+    eda_exercise()
+
+    visualization_exercise()
